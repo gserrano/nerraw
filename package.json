@@ -1,0 +1,23 @@
+{
+  "name": "Nerraw",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "blinktrade": "0.0.11",
+    "colors": "^1.1.2",
+    "columnify": "^1.5.4",
+    "prompt": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist",
+    "app": "node dist/index.js"
+  },
+  "author": "@gserrano (https://guilhermeserrano.com.br/)",
+  "license": "GNU9"
+}

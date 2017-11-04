@@ -1,0 +1,8 @@
+'use strict'
+
+let config = {
+	KEY : '',
+	SECRET : ''
+}
+
+module.exports = config;
