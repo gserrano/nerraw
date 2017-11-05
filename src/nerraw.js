@@ -277,7 +277,7 @@ class Nerraw {
 
 	cancelAll(){
 		blinktrade.myOrders().then( (myOrders) => {
-			myOrders.OrdListGrp.forEach( (order) => {
+			myOrders.OrdListGrp.map(order => {
 				if(order.OrdStatus != 2 && order.OrdStatus != 4){
 					this._cancelOrder(order);
 				}
