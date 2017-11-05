@@ -16,6 +16,22 @@ const blinktrade = new BlinkTradeRest({
 	currency: 'BRL'
 });
 
+const OrdRejReason = {
+	'0' :  'Broker / Exchange option',
+	'1' :  'Unknown symbol',
+	'2' :  'Exchange closed',
+	'3' :  'Order exceeds limit',
+	'4' :  'Too late to enter',
+	'5' :  'Unknown Order',
+	'6' :  'Duplicate Order (e.g. dupe ClOrdID <11>)',
+	'7' :  'Duplicate of a verbally communicated order',
+	'8' :  'Stale Order',
+	'9' :  'Trade Along required',
+	'10' : 'Invalid Investor ID',
+	'11' : 'Unsupported order characteristic',
+	'12' : 'Surveillence Option'
+};
+
 
 class Nerraw {
 	start(){
@@ -34,13 +50,13 @@ class Nerraw {
 				// setup the dialog
 				confirm: {
 					// allow yes, no, y, n, YES, NO, Y, N as answer
-					pattern: /^(buy|b|sell|s|info|i|c|cancel|q|quit)$/gi,
+					pattern: /^(buy|b|sell|s|price|p|c|cancel|q|quit)$/gi,
 					description: colors.blue('How can I help you?\n '+ 
-						colors.blue.bold('(b)') +'uy\n '+ 
-						colors.blue.bold('(s)') +'ell\n '+ 
-						colors.blue.bold('(i)') +'nfo\n '+ 
-						colors.blue.bold('(c)') +'ancel all order \n '+ 
-						colors.blue.bold('(q)') +'uit\n '),
+						colors.yellow.bold('(b)') +'uy\n '+ 
+						colors.yellow.bold('(s)') +'ell\n '+ 
+						colors.yellow.bold('(p)') +'rices (book)\n '+ 
+						colors.yellow.bold('(c)') +'ancel all order \n '+ 
+						colors.yellow.bold('(q)') +'uit\n '),
 					message: '',
 					required: true,
 					default: 'i'
@@ -51,8 +67,8 @@ class Nerraw {
 			let action = result.confirm.toLowerCase();
 
 			switch (action){
-			case 'i':
-			case 'info':
+			case 'p':
+			case 'prices':
 				this.info();
 				break;
 
@@ -174,8 +190,15 @@ class Nerraw {
 			'amount': parseInt((data.qty * 1e8).toFixed(0)),
 			'symbol': 'BTCBRL',
 		}).then( (order) => {
-			// logger.info(order);
-			console.log(order);
+
+			if( order.constructor === Array && order[0].OrderID !== null){
+				logger.info( colors.green.bold(`# SELL ORDER CREATED. #`) );
+				logger.info( colors.green(`Order ID: ${order[0].OrderID}`) );
+			}else{
+				logger.info( colors.red.bold(`# SELL ORDER NOT CREATED #`) );
+				logger.info( colors.red(`${OrdRejReason[order.OrdRejReason]}`) );
+			}
+
 			this.menu();
 		});
 	}
@@ -187,8 +210,15 @@ class Nerraw {
 			'amount': parseInt((data.qty * 1e8).toFixed(0)),
 			'symbol': 'BTCBRL',
 		}).then( (order) => {
-			// logger.log(order);
-			console.log(order);
+
+			if( order.constructor === Array && order[0].OrderID !== null){
+				logger.info( colors.green.bold(`# BUY ORDER CREATED #.`) );
+				logger.info( colors.green(`Order ID: ${order[0].OrderID}`) );
+			}else{
+				logger.info( colors.red.bold('# BUY ORDER NOT CREATED #') );
+				logger.info( colors.red(`${OrdRejReason[order.OrdRejReason]}`) );
+			}
+
 			this.menu();
 		});
 	}
@@ -258,9 +288,8 @@ class Nerraw {
 
 	_cancelOrder(order){
 		blinktrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then( (order) => {
-			// logger.info(order);
-			console.log(order);
-			logger.info('Order Cancelled');
+			logger.info( colors.yellow.bold('ORDER CANCELLED') );
+			logger.info( colors.yellow(`Order id: ${order[0].OrderID}}`) );
 		});
 	}
 
