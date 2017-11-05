@@ -1,31 +1,28 @@
-'use strict'
+const logger = require('eazy-logger').Logger({
+	useLevelPrefixes: false
+});
 
-import config from "./config.js";
+const config = require('./config');
 
-const BlinkTradeRest = require("blinktrade").BlinkTradeRest;
+const BlinkTradeRest = require('blinktrade').BlinkTradeRest;
 const _prompt = require('prompt');
 const columnify = require('columnify');
 const colors = require('colors/safe');
 
 const blinktrade = new BlinkTradeRest({
-  prod: true,
-  key: config.KEY,
-  secret: config.SECRET,
-  currency: "BRL"
+	prod: true,
+	key: config.KEY,
+	secret: config.SECRET,
+	currency: 'BRL'
 });
 
 
 class Nerraw {
-	constructor (config){
-		
-	}
-
 	start(){
-		console.log( colors.blue.bold('Hello, My name is Nerraw.'));
-
+		logger.info(colors.blue.bold('Hello, My name is Nerraw.'));
 		blinktrade.balance().then( (balance) => {
-			console.log('balance');
-			console.log(balance);
+			logger.info('balance');
+			logger.info(balance);
 		});
 		this.info();
 	}
@@ -54,44 +51,43 @@ class Nerraw {
 			let action = result.confirm.toLowerCase();
 
 			switch (action){
-				case 'i':
-				case 'info':
-					this.info();
-					break;
+			case 'i':
+			case 'info':
+				this.info();
+				break;
 
-				case 's':
-				case 'sell':
-					this.sell();
-					break;
+			case 's':
+			case 'sell':
+				this.sell();
+				break;
 
-				case 'b':
-				case 'buy':
-					this.buy();
-					break;
+			case 'b':
+			case 'buy':
+				this.buy();
+				break;
 
-				case 'sellMarketing':
-					blinktrade.ticker().then( (ticker) => {
-					  // console.log(ticker.sell);
+			case 'sellMarketing':
+				// @todo
+				// blinktrade.ticker().then( (ticker) => {
+				// 	let price = (ticker.sell-0.01);
+				// 	let qty = 0.1;
 
-					  let price = (ticker.sell-0.01);
-					  let qty = 0.1;
+				// 	let data = {price:price, qty:qty};
 
-					  let data = {price:price, qty:qty}
+				// 	// logger.info(data);
+				// 	// sell(data);
+				// });
+				break;
 
-					  // console.log(data);
-					  // sell(data);
-					})
-					break;
+			case 'c':
+			case 'cancel':
+				this.cancelAll();
+				break;
 
-				case 'c':
-				case 'cancel':
-					this.cancelAll();
-					break;
-
-				case 'q':
-				case 'quit':
-					process.exit();
-					break;
+			case 'q':
+			case 'quit':
+				process.exit();
+				break;
 
 			}
 			
@@ -99,89 +95,86 @@ class Nerraw {
 	}
 
 	sell(){
-		console.log(colors.red('SELLING BITCOIN'));
+		logger.info(colors.red('SELLING BITCOIN'));
 		_prompt.get({
-		    properties: {
-		        // setup the dialog
-		        confirm: {
-		            // pattern: /^(buy|b|sell|s|info|i)$/gi,
-		            description: 'Bitcoins quantity',
-		            message: '',
-		            required: true,
-		            default: '0.25'
-		        }
-		    }
+			properties: {
+				// setup the dialog
+				confirm: {
+					// pattern: /^(buy|b|sell|s|info|i)$/gi,
+					description: 'Bitcoins quantity',
+					message: '',
+					required: true,
+					default: '0.25'
+				}
+			}
 		}, (err, result) => {
 			let qty = result.confirm;
 
 			_prompt.get({
-			    properties: {
-			        // setup the dialog
-			        confirm: {
-			            // pattern: /^(buy|b|sell|s|info|i)$/gi,
-			            description: 'Price',
-			            message: '',
-			            required: true,
-			            default: this.ticker.sell
-			        }
-			    }
+				properties: {
+					// setup the dialog
+					confirm: {
+						// pattern: /^(buy|b|sell|s|info|i)$/gi,
+						description: 'Price',
+						message: '',
+						required: true,
+						default: this.ticker.sell
+					}
+				}
 			}, (err, result) => {
 				let price = result.confirm;
-
 				let data = {qty:qty, price: price};
 				this._sell(data);
-			})
-
-		})
+			});
+		});
 	}
 
 	buy(){
-		console.log(colors.green('BUYING BITCOIN'));
+		logger.info(colors.green('BUYING BITCOIN'));
 
 		_prompt.get({
-		    properties: {
-		        // setup the dialog
-		        confirm: {
-		            // pattern: /^(buy|b|sell|s|info|i)$/gi,
-		            description: 'Bitcoins quantity',
-		            message: '',
-		            required: true,
-		            default: '0.25'
-		        }
-		    }
+			properties: {
+				// setup the dialog
+				confirm: {
+					// pattern: /^(buy|b|sell|s|info|i)$/gi,
+					description: 'Bitcoins quantity',
+					message: '',
+					required: true,
+					default: '0.25'
+				}
+			}
 		}, (err, result) => {
 			let qty = result.confirm;
 
 			_prompt.get({
-			    properties: {
-			        // setup the dialog
-			        confirm: {
-			            // pattern: /^(buy|b|sell|s|info|i)$/gi,
-			            description: 'Price',
-			            message: '',
-			            required: true,
-			            default: this.ticker.buy
-			        }
-			    }
+				properties: {
+					// setup the dialog
+					confirm: {
+						// pattern: /^(buy|b|sell|s|info|i)$/gi,
+						description: 'Price',
+						message: '',
+						required: true,
+						default: this.ticker.buy
+					}
+				}
 			}, (err, result) => {
 				let price = result.confirm;
 
 				let data = {qty:qty, price: price};
 				this._buy(data);
-			})
+			});
 
-		})
+		});
 	}
 
 	_sell(data){
-		console.log(data);
-		console.log(blinktrade);
 		blinktrade.sendOrder({
-			"side": "2",
-			"price": parseInt((data.price * 1e8).toFixed(0)),
-			"amount": parseInt((data.qty * 1e8).toFixed(0)),
-			"symbol": "BTCBRL",
+			'side': '2',
+			'price': parseInt((data.price * 1e8).toFixed(0)),
+			'amount': parseInt((data.qty * 1e8).toFixed(0)),
+			'symbol': 'BTCBRL',
 		}).then( (order) => {
+			// logger.info(order);
 			console.log(order);
 			this.menu();
 		});
@@ -189,11 +182,12 @@ class Nerraw {
 
 	_buy(data){
 		blinktrade.sendOrder({
-			"side": "1",
-			"price": parseInt((data.price * 1e8).toFixed(0)),
-			"amount": parseInt((data.qty * 1e8).toFixed(0)),
-			"symbol": "BTCBRL",
+			'side': '1',
+			'price': parseInt((data.price * 1e8).toFixed(0)),
+			'amount': parseInt((data.qty * 1e8).toFixed(0)),
+			'symbol': 'BTCBRL',
 		}).then( (order) => {
+			// logger.log(order);
 			console.log(order);
 			this.menu();
 		});
@@ -207,14 +201,16 @@ class Nerraw {
 			let _bids = [];
 
 			bids.forEach( (bid, i) => {
-				_bids.push({bid_price: colors.green(bid[0]), bid_qty: colors.green(bid[1]), space: '', ask_price : colors.red(asks[i][0]), ask_qty : colors.red(asks[i][1])});
-			})
+				_bids.push({ 
+					bid_price: colors.green(bid[0]),
+					bid_qty: colors.green(bid[1]),
+					space: '',
+					ask_price : colors.red(asks[i][0]),
+					ask_qty : colors.red(asks[i][1])
+				});
+			});
 
-			console.log(columnify(_bids));
-
-			// console.log(bids);
-			// console.log(asks);
-
+			logger.info(columnify(_bids));
 			this.menu();
 		});
 	}
@@ -225,12 +221,12 @@ class Nerraw {
 
 			this.ticker = ticker;
 
-			console.log( columnify([{
+			logger.info( columnify([{
 				HIGH: colors.green(ticker.high),
 				LOW: colors.red(ticker.low)
 			}]));
 
-			console.log('-----------')
+			logger.info('-----------');
 
 			let data = [
 				{
@@ -238,12 +234,12 @@ class Nerraw {
 					SELL: colors.red(ticker.sell),
 					LAST: colors.yellow.bold(ticker.last)
 				}
-			]
+			];
 
 
-			console.log(columnify(data));
+			logger.info(columnify(data));
 
-			console.log('-----------')
+			logger.info('-----------');
 			this.book();
 
 		});
@@ -251,27 +247,22 @@ class Nerraw {
 
 	cancelAll(){
 		blinktrade.myOrders().then( (myOrders) => {
-			console.log(myOrders);
-
 			myOrders.OrdListGrp.forEach( (order) => {
 				if(order.OrdStatus != 2 && order.OrdStatus != 4){
 					this._cancelOrder(order);
 				}
 			});
-
 			this.menu();
 		});
 	}
 
 	_cancelOrder(order){
-		console.log(order)
 		blinktrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then( (order) => {
+			// logger.info(order);
 			console.log(order);
-			console.log("Order Cancelled");
+			logger.info('Order Cancelled');
 		});
 	}
 
 }
-
-
 module.exports = Nerraw;
