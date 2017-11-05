@@ -1,6 +1,6 @@
 'use strict'
 
-let config = {
+const config = {
 	KEY : '',
 	SECRET : ''
 }
