@@ -1,5 +1,4 @@
 const logger = require('eazy-logger').Logger({
-	prefix: '{blue:[}{magenta:easy-logger}{blue:] }',
 	useLevelPrefixes: false
 });
 
