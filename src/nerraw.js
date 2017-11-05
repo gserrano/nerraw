@@ -21,9 +21,9 @@ class Nerraw {
 	start(){
 		logger.info(colors.blue.bold('Hello, My name is Nerraw.'));
 
-		blinktrade.balance().then(function(balance) {
+		blinktrade.balance().then((balance) => {
 			logger.info('balance');
-			logger.info(balance);
+			logger.info(`${balance}`);
 		});
 		this.info();
 	}
@@ -48,7 +48,7 @@ class Nerraw {
 					default: 'i'
 				}
 			}
-		}, function (err, result){
+		}, (err, result) => {
 			// transform to lower case
 			let action = result.confirm.toLowerCase();
 
@@ -183,7 +183,7 @@ class Nerraw {
 			'amount': parseInt((data.qty * 1e8).toFixed(0)),
 			'symbol': 'BTCBRL',
 		}).then((order) => {
-			logger.log('error', 'Use {green:built-in} %s', order);
+			logger.info(`${order}`);
 			_this.menu();
 		});
 	}
@@ -196,7 +196,7 @@ class Nerraw {
 			'amount': parseInt((data.qty * 1e8).toFixed(0)),
 			'symbol': 'BTCBRL',
 		}).then((order) => {
-			logger.log(order);
+			logger.info(`${order}`);
 			_this.menu();
 		});
 	}
@@ -219,7 +219,8 @@ class Nerraw {
 				});
 			});
 
-			logger.info(columnify(_bids));
+            const value = columnify(_bids)
+			logger.info(`${value}`);
 			_this.menu();
 		});
 	}
@@ -227,7 +228,7 @@ class Nerraw {
 
 	info(){
 		let _this = this;
-		blinktrade.ticker().then(function(ticker) {
+		blinktrade.ticker().then((ticker) => {
 			
 			_this.ticker = ticker;
 			logger.info( columnify([{
@@ -244,7 +245,8 @@ class Nerraw {
 				}
 			];
 
-			logger.info(columnify(data));
+            const value = columnify(data)
+			logger.info(`${value}`);
 			logger.info('-----------');
 			_this.book();
 		});
@@ -272,7 +274,7 @@ class Nerraw {
 				orderID: order.OrderID,
 				clientId: order.ClOrdID
 			}).then((order) => {
-				logger.info(order);
+				logger.info(`${order}`);
 				logger.info.error('Order Cancelled');
 			});
 	}
