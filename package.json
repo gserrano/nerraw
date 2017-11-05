@@ -7,11 +7,13 @@
     "blinktrade": "0.0.11",
     "colors": "^1.1.2",
     "columnify": "^1.5.4",
+    "eazy-logger": "^3.0.2",
     "prompt": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0"
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "eslint": "^4.10.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

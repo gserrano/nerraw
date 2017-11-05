@@ -1,6 +1,4 @@
-'use strict'
-
-import Nerraw from "./nerraw.js";
+const Nerraw = require('./nerraw');
 
 const nerraw = new Nerraw;
 
