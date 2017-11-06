@@ -64,7 +64,7 @@ class Nerraw {
 			}
 		},  (err, result) => {
 			// transform to lower case
-			let action = result.confirm.toLowerCase();
+			const action = result.confirm.toLowerCase();
 
 			switch (action){
 			case 'p':
@@ -124,7 +124,7 @@ class Nerraw {
 				}
 			}
 		}, (err, result) => {
-			let qty = result.confirm;
+			const qty = result.confirm;
 
 			_prompt.get({
 				properties: {
@@ -138,9 +138,8 @@ class Nerraw {
 					}
 				}
 			}, (err, result) => {
-				let price = result.confirm;
-				let data = {qty:qty, price: price};
-				this._sell(data);
+				const price = result.confirm;
+				this._sell({qty, price});
 			});
 		});
 	}
@@ -160,7 +159,7 @@ class Nerraw {
 				}
 			}
 		}, (err, result) => {
-			let qty = result.confirm;
+			const qty = result.confirm;
 
 			_prompt.get({
 				properties: {
@@ -174,10 +173,8 @@ class Nerraw {
 					}
 				}
 			}, (err, result) => {
-				let price = result.confirm;
-
-				let data = {qty:qty, price: price};
-				this._buy(data);
+				const price = result.confirm;
+				this._buy({qty , price});
 			});
 
 		});
@@ -225,19 +222,17 @@ class Nerraw {
 
 	book(){
 		blinktrade.orderbook().then( (orderbook) => {
-			let bids = orderbook.bids.slice(0,25);
-			let asks = orderbook.asks.slice(0,25);
+			const bids = orderbook.bids.slice(0,25);
+			const asks = orderbook.asks.slice(0,25);
 
-			let _bids = [];
-
-			bids.forEach( (bid, i) => {
-				_bids.push({ 
+			const _bids = bids.forEach( (bid, i) => {
+				return { 
 					bid_price: colors.green(bid[0]),
 					bid_qty: colors.green(bid[1]),
 					space: '',
 					ask_price : colors.red(asks[i][0]),
 					ask_qty : colors.red(asks[i][1])
-				});
+				};
 			});
 
 			logger.info(columnify(_bids));
@@ -256,7 +251,7 @@ class Nerraw {
 				LOW: colors.red(ticker.low)
 			}]));
 
-			logger.info('-----------');
+			
 
 			let data = [
 				{
@@ -267,11 +262,8 @@ class Nerraw {
 			];
 
 
-			logger.info(columnify(data));
-
-			logger.info('-----------');
+			logger.info(`-----------\n${columnify(data)}\n-----------'`);
 			this.book();
-
 		});
 	}
 
