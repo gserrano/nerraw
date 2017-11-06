@@ -1,7 +1,5 @@
 'use strict'
 
-import Nerraw from "./nerraw.js";
-
-const nerraw = new Nerraw;
+import nerraw from "./nerraw.js";
 
 nerraw.start();
