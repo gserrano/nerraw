@@ -32,3 +32,13 @@ Este comando irá gerar o código para ser executado. Este comando deve ser exec
 npm run app
 ```
 Este comando irá executar o Nerraw e fornecerá as informações da corretora e as opções disponíveis.
+
+
+### Como contribuir para este projeto?
+
+Você pode contribuir com este projeto de diversas maneiras:
+- Testando e dando feeedback
+- Divulgando
+- Reportando bugs e solicitando novas funcionalidades (através da abertura de issue)
+- Resolvendo issues abertas
+- Melhorando o código ou implementando novas funcionalidades (os pull-requests devem ser feitos na branch dev)
