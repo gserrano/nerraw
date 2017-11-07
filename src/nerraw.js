@@ -256,8 +256,8 @@ class Nerraw {
 				HIGH: colors.green(ticker.high),
 				LOW: colors.red(ticker.low)
 			}]));
-
-			let data = [
+			
+			const data = [
 				{
 					BUY: colors.green(ticker.buy),
 					SELL: colors.red(ticker.sell),
