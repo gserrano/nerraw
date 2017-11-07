@@ -33,6 +33,30 @@ npm run app
 ```
 Este comando irá executar o Nerraw e fornecerá as informações da corretora e as opções disponíveis.
 
+Atualmente você tem as seguintes opções:
+
+```
+How can I help you?
+ (b)uy
+ (s)ell
+ (p)rices (book)
+ (c)ancel all order 
+ (q)uit
+```
+#### (b)uy
+Inicia uma ordem de COMPRA de bitcoins. Você deverá informar a quantidade que pretende comprar e o preço por bitcoin.
+
+#### (s)ell
+Inicia uma ordem de VENDA de bitcoins. Você deverá informar a quantidade que pretende vender e o preço por bitcoin.
+
+#### (p)rices (book)
+Exibe dados da última transação realizada na corretora e o book de ordens de compra e venda disponíveis.
+
+#### (c)ancel all order 
+Cancela todas as ordens (de compra e de venda) abertas na sua conta.
+
+#### (q)uit
+Encerra a aplicação.
 
 ### Como contribuir para este projeto?
 
