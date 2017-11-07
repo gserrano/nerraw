@@ -16,75 +16,91 @@ const blinktrade = new BlinkTradeRest({
 	currency: 'BRL'
 });
 
+const OrdRejReason = {
+	'0' :  'Broker / Exchange option',
+	'1' :  'Unknown symbol',
+	'2' :  'Exchange closed',
+	'3' :  'Order exceeds limit',
+	'4' :  'Too late to enter',
+	'5' :  'Unknown Order',
+	'6' :  'Duplicate Order (e.g. dupe ClOrdID <11>)',
+	'7' :  'Duplicate of a verbally communicated order',
+	'8' :  'Stale Order',
+	'9' :  'Trade Along required',
+	'10' : 'Invalid Investor ID',
+	'11' : 'Unsupported order characteristic',
+	'12' : 'Surveillence Option'
+};
+
 
 class Nerraw {
 	start(){
 		logger.info(colors.blue.bold('Hello, My name is Nerraw.'));
-
-		blinktrade.balance().then((balance) => {
+		blinktrade.balance().then( (balance) => {
 			logger.info('balance');
-			logger.info(`${balance}`);
+			logger.info(balance);
 		});
 		this.info();
 	}
 
 	menu(){
-		let _this = this;
 
 		_prompt.get({
 			properties: {
 				// setup the dialog
 				confirm: {
 					// allow yes, no, y, n, YES, NO, Y, N as answer
-					pattern: /^(buy|b|sell|s|info|i|c|cancel|q|quit)$/gi,
+					pattern: /^(buy|b|sell|s|price|p|c|cancel|q|quit)$/gi,
 					description: colors.blue('How can I help you?\n '+ 
-						colors.blue.bold('(b)') +'uy\n '+ 
-						colors.blue.bold('(s)') +'ell\n '+ 
-						colors.blue.bold('(i)') +'nfo\n '+ 
-						colors.blue.bold('(c)') +'ancel all order \n '+ 
-						colors.blue.bold('(q)') +'uit\n '),
+						colors.yellow.bold('(b)') +'uy\n '+ 
+						colors.yellow.bold('(s)') +'ell\n '+ 
+						colors.yellow.bold('(p)') +'rices (book)\n '+ 
+						colors.yellow.bold('(c)') +'ancel all order \n '+ 
+						colors.yellow.bold('(q)') +'uit\n '),
 					message: '',
 					required: true,
 					default: 'i'
 				}
 			}
-		}, (err, result) => {
+
+		},  (err, result) => {
+
 			// transform to lower case
-			let action = result.confirm.toLowerCase();
+			const action = result.confirm.toLowerCase();
 
 			switch (action){
-			case 'i':
-			case 'info':
-				_this.info();
+
+			case 'p':
+			case 'prices':
+				this.info();
 				break;
 
 			case 's':
 			case 'sell':
-				_this.sell();
+				this.sell();
 				break;
 
 			case 'b':
 			case 'buy':
-				_this.buy();
+				this.buy();
 				break;
 
 			case 'sellMarketing':
-				blinktrade.ticker().then((ticker) => {
-					// logger.info(ticker.sell);
+				// @todo
+				// blinktrade.ticker().then( (ticker) => {
+				// 	let price = (ticker.sell-0.01);
+				// 	let qty = 0.1;
 
-					let price = (ticker.sell-0.01);
-					let qty = 0.1;
+				// 	let data = {price:price, qty:qty};
 
-					let data = {price:price, qty:qty};
-
-					logger.info(data);
-					// sell(data);
-				});
+				// 	// logger.info(data);
+				// 	// sell(data);
+				// });
 				break;
 
 			case 'c':
 			case 'cancel':
-				_this.cancelAll();
+				this.cancelAll();
 				break;
 
 			case 'q':
@@ -98,7 +114,6 @@ class Nerraw {
 	}
 
 	sell(){
-		let _this = this;
 		logger.info(colors.red('SELLING BITCOIN'));
 		_prompt.get({
 			properties: {
@@ -111,32 +126,29 @@ class Nerraw {
 					default: '0.25'
 				}
 			}
-		},	(err, result) => {
-			let qty = result.confirm;
+		}, (err, result) => {
+			const qty = result.confirm;
 
 			_prompt.get({
 				properties: {
-				// setup the dialog
+					// setup the dialog
 					confirm: {
-					// pattern: /^(buy|b|sell|s|info|i)$/gi,
+						// pattern: /^(buy|b|sell|s|info|i)$/gi,
 						description: 'Price',
 						message: '',
 						required: true,
-						default: _this.ticker.sell
+						default: this.ticker.sell
 					}
 				}
-			},	(err, result) =>	{
-				let price = result.confirm;
-				let data = {qty:qty, price: price};
-				_this._sell(data);
+			}, (err, result) => {
+				const price = result.confirm;
+				this._sell({qty, price});
 			});
-
 		});
 	}
 
 	buy(){
-		let _this = this;
-		logger.info(colors.green('BUYING BITCOIN.info'));
+		logger.info(colors.green('BUYING BITCOIN'));
 
 		_prompt.get({
 			properties: {
@@ -150,7 +162,7 @@ class Nerraw {
 				}
 			}
 		}, (err, result) => {
-			let qty = result.confirm;
+			const qty = result.confirm;
 
 			_prompt.get({
 				properties: {
@@ -160,56 +172,65 @@ class Nerraw {
 						description: 'Price',
 						message: '',
 						required: true,
-						default: _this.ticker.buy
+						default: this.ticker.buy
 					}
 				}
 			}, (err, result) => {
-				let price = result.confirm;
-
-				let data = {qty:qty, price: price};
-				_this._buy(data);
+				const price = result.confirm;
+				this._buy({qty , price});
 			});
 
 		});
 	}
 
 	_sell(data){
-		let _this = this;
-		logger.info(data);
-		logger.info(blinktrade);
 		blinktrade.sendOrder({
 			'side': '2',
 			'price': parseInt((data.price * 1e8).toFixed(0)),
 			'amount': parseInt((data.qty * 1e8).toFixed(0)),
 			'symbol': 'BTCBRL',
-		}).then((order) => {
-			logger.info(`${order}`);
-			_this.menu();
+
+		}).then( (order) => {
+
+			if( order.constructor === Array && order[0].OrderID !== null){
+				logger.info( colors.green.bold(`# SELL ORDER CREATED. #`) );
+				logger.info( colors.green(`Order ID: ${order[0].OrderID}`) );
+			}else{
+				logger.info( colors.red.bold(`# SELL ORDER NOT CREATED #`) );
+				logger.info( colors.red(`${OrdRejReason[order.OrdRejReason]}`) );
+			}
+
+			this.menu();
 		});
 	}
 
 	_buy(data){
-		let _this = this;
 		blinktrade.sendOrder({
 			'side': '1',
 			'price': parseInt((data.price * 1e8).toFixed(0)),
 			'amount': parseInt((data.qty * 1e8).toFixed(0)),
 			'symbol': 'BTCBRL',
-		}).then((order) => {
-			logger.info(`${order}`);
-			_this.menu();
+		}).then( (order) => {
+
+			if( order.constructor === Array && order[0].OrderID !== null){
+				logger.info( colors.green.bold(`# BUY ORDER CREATED #.`) );
+				logger.info( colors.green(`Order ID: ${order[0].OrderID}`) );
+			}else{
+				logger.info( colors.red.bold('# BUY ORDER NOT CREATED #') );
+				logger.info( colors.red(`${OrdRejReason[order.OrdRejReason]}`) );
+			}
+
+			this.menu();
 		});
 	}
 
 	book(){
-		let _this = this;
-		blinktrade.orderbook().then((orderbook) =>{
-			let bids = orderbook.bids.slice(0,25);
-			let asks = orderbook.asks.slice(0,25);
-
+		blinktrade.orderbook().then( (orderbook) => {
+			const bids = orderbook.bids.slice(0,25);
+			const asks = orderbook.asks.slice(0,25);
 			let _bids = [];
 
-			bids.forEach((bid, i) =>{
+			bids.forEach( (bid, i) => {
 				_bids.push({ 
 					bid_price: colors.green(bid[0]),
 					bid_qty: colors.green(bid[1]),
@@ -219,24 +240,23 @@ class Nerraw {
 				});
 			});
 
-            const value = columnify(_bids)
-			logger.info(`${value}`);
-			_this.menu();
+			logger.info(columnify(_bids));
+			this.menu();
+
 		});
 	}
 
 
 	info(){
-		let _this = this;
-		blinktrade.ticker().then((ticker) => {
-			
-			_this.ticker = ticker;
+		blinktrade.ticker().then( (ticker) => {
+
+			this.ticker = ticker;
+
 			logger.info( columnify([{
 				HIGH: colors.green(ticker.high),
 				LOW: colors.red(ticker.low)
 			}]));
 
-			logger.info('-----------');
 			let data = [
 				{
 					BUY: colors.green(ticker.buy),
@@ -245,39 +265,27 @@ class Nerraw {
 				}
 			];
 
-            const value = columnify(data)
-			logger.info(`${value}`);
-			logger.info('-----------');
-			_this.book();
+			logger.info(`-----------\n${columnify(data)}\n-----------`);
+			this.book();
 		});
 	}
 
 	cancelAll(){
-		let _this = this;
-		blinktrade.myOrders().then((myOrders) => {
-			logger.info(myOrders);
-
-			myOrders.OrdListGrp.map(order => {
-				if (order.OrdStatus != 2 && order.OrdStatus != 4) {
-
-					_this._cancelOrder(order);
+		blinktrade.myOrders().then( (myOrders) => {
+			myOrders.OrdListGrp.forEach(order => {
+				if(order.OrdStatus != 2 && order.OrdStatus != 4){
+					this._cancelOrder(order);
 				}
 			});
-
-			_this.menu();
+			this.menu();
 		});
 	}
 
 	_cancelOrder(order){
-		logger.info(order);
-		blinktrade
-			.cancelOrder({ 
-				orderID: order.OrderID,
-				clientId: order.ClOrdID
-			}).then((order) => {
-				logger.info(`${order}`);
-				logger.info.error('Order Cancelled');
-			});
+		blinktrade.cancelOrder({ orderID: order.OrderID, clientId: order.ClOrdID }).then( (order) => {
+			logger.info( colors.yellow.bold('ORDER CANCELLED') );
+			logger.info( colors.yellow(`Order id: ${order[0].OrderID}}`) );
+		});
 	}
 
 }

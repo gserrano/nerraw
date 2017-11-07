@@ -1,6 +1,6 @@
 const config = {
 	KEY : '',
 	SECRET : ''
-}
+};
 
 module.exports = config;
