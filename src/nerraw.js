@@ -253,7 +253,7 @@ class Nerraw {
 
 			
 
-			let data = [
+			const data = [
 				{
 					BUY: colors.green(ticker.buy),
 					SELL: colors.red(ticker.sell),
@@ -262,7 +262,7 @@ class Nerraw {
 			];
 
 
-			logger.info(`-----------\n${columnify(data)}\n-----------'`);
+			logger.info(`-----------\n${columnify(data)}\n-----------`);
 			this.book();
 		});
 	}
